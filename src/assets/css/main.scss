@@ -1,0 +1,112 @@
+@import "normalize";
+@import "variables";
+
+* {
+  font-family: sans-serif;
+}
+body {
+  background: $bgColor;
+}
+
+button[disabled] {
+  opacity: .5;
+
+  &:hover {
+    box-shadow: none;
+  }
+}
+
+label, input, textarea {
+  display: block;
+  width: 100%;
+}
+
+label, input, textarea, button {
+  cursor: pointer;
+}
+
+.v-container {
+  padding-left: 15px;
+  padding-right: 15px;
+  width: 100%;
+  margin: auto;
+  max-width: 1200px;
+}
+
+.v-box-hover {
+  transition: .2s ease;
+    &:hover {
+    box-shadow: $boxShadow;
+    transform: translateY(2px);
+  }
+  &[disabled] {
+    &:hover {
+      transform: translateY(0);
+    }
+  }
+}
+
+.v-row {
+  display: flex;
+  flex: 100%;
+}
+
+.v-col {
+  width: 100%;
+}
+
+.v-scroll {
+  &::-webkit-scrollbar {
+    width: 5px;
+    border-radius: 8px;
+    padding: 5px;
+    margin-left: 5px;
+
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    transition: .2s ease;
+    cursor: pointer;
+
+    &:hover {
+      background: #555;
+      cursor: pointer;
+    }
+  }
+}
+
+.v-scroll-hidden {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.todo-list__item {
+  width: 100%;
+}
+
+.todo-list-move,
+.todo-list-enter-active {
+  transition: all .5s ease;
+}
+
+.todo-list-enter-from,
+.todo-list-leave-to {
+  opacity: 0;
+  transform: translateY(-100%);
+}
+
+.todo-list-leave-active {
+  position: absolute;
+  width: calc(100% - 30px);
+}
