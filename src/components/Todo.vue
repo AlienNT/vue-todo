@@ -101,6 +101,18 @@ export default {
     },
     selectedTodoAmount() {
       return this.selectedTodos?.length || 0
+    },
+    localStorage: {
+      get() {
+        const storage = localStorage.getItem('todoList')
+
+        return storage ?
+            JSON.parse(storage) :
+            localStorage.setItem('todoList', '[]')
+      },
+      set(data) {
+        localStorage.setItem('todoList', JSON.stringify(data))
+      }
     }
   },
   methods: {
@@ -139,35 +151,24 @@ export default {
     deleteAction() {
       this.todoList = this.todoList.filter(todo => !todo.status)
     },
-    createLStorage() {
-      return localStorage.setItem('todoList', '[]')
-    },
-    updateLStorage() {
-      return localStorage.todoList = JSON.stringify(this.todoList)
-    },
-    getLStorage() {
-      const todos = localStorage.getItem('todoList');
-
-      return todos ? JSON.parse(todos) : undefined
-    },
-    setTodosInStorage(storage) {
-      return storage?.length ? this.todoList = storage : undefined
+    setTodosInStorage() {
+      return this.localStorage?.length ?
+          this.todoList = this.localStorage :
+          undefined
     }
   },
   watch: {
     todoList: {
-      handler() {
-        this.updateLStorage()
+      handler(data) {
+        this.localStorage = data
       },
       deep: true
     }
   },
   created() {
-    const storage = this.getLStorage()
-
-    !storage ?
-        this.createLStorage() :
-        this.setTodosInStorage(storage)
+    if (this.localStorage?.length) {
+      this.setTodosInStorage()
+    }
   },
 }
 </script>
