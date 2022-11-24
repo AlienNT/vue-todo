@@ -19,7 +19,8 @@ export default {
 <style lang="scss">
 @import "assets/css/main";
 #app {
-  min-height: 100vh;
+  height: 100vh;
+  max-height: -webkit-fill-available;
   display: flex;
 }
 </style>
