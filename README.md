@@ -6,7 +6,7 @@
 
 ![Скрин](/public/screen.png)
 
-##Технологии:
+## Технологии:
 * Vue
 * JavaScript ES6
 * HTML5
