@@ -40,9 +40,16 @@ export default {
     }
   },
   computed: {
+    /**
+     * возвращает дату создания элемента
+     * @returns {null|string}
+     */
     date() {
       return this.getDateFormat(this.data?.date)
     },
+    refItem() {
+      return this.$refs["todo-item"]
+    }
   },
   methods: {
     setStatus() {
@@ -51,18 +58,31 @@ export default {
         status: !this.data.status
       })
     },
+    /**
+     * возвращает дату в формате ДД.ММ.ГГГГ
+     * @param date - дата в миллисекундах
+     * @returns {string|null}
+     */
     getDateFormat(date) {
       return date ? new Date(date).toLocaleDateString() : null
     },
+    /**
+     * скроллит к элементу до зоны видимости
+     * @returns {void|undefined}
+     */
+    scrollToView() {
+      return this.refItem ? this.refItem.scrollIntoView() : undefined
+    }
   },
   mounted() {
-    this.$refs["todo-item"].scrollIntoView()
+    this.scrollToView()
   }
 }
 </script>
 
 <style scoped lang="scss">
 @import "src/assets/css/variables";
+
 .v-todo-item {
   cursor: pointer;
   background: #ffffff;
@@ -117,6 +137,7 @@ export default {
   font-weight: 500;
   line-height: 1.1;
   opacity: .8;
+
   &:first-letter {
     text-transform: uppercase;
     font-weight: bold;

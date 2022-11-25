@@ -1,24 +1,14 @@
-# vue-todo
+# Vue-todo
+***
+## О проекте
 
-## Project setup
-```
-npm install
-```
+Проект представляет из себя простой редактор списка дел с возможностями создания, редактирования, удаления записей и локального их хранения с помощью localStorage
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+![Скрин](/public/screen.png)
 
-### Compiles and minifies for production
-```
-npm run build
-```
+##Технологии:
+* Vue
+* JavaScript ES6
+* HTML5
+* CSS(SCSS)
 
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

@@ -11,14 +11,18 @@
           name="title"
           placeholder="Title"
           title="input title"
+          minlength="2"
+          maxlength="50"
       >
     </label>
     <label class="todo-form__label">
       <textarea
           v-model="formDescription"
-          class="todo-form__textarea v-box-hover"
+          ref="description"
+          class="todo-form__textarea v-box-hover v-scroll-hidden"
           placeholder="Description"
           title="input description"
+          maxlength="200"
       />
     </label>
     <div class="todo-form__button-wrapper">
@@ -49,16 +53,43 @@ export default {
       formData: {
         title: null,
         description: null
+      },
+      rules: {
+        title: {
+          minLength: 2,
+          maxLength: 50
+        },
+        description: {
+          maxLength: 200
+        }
       }
     }
   },
   computed: {
-    submitDisable() {
-      return !(
-          this.getCharactersCounter(this.formTitle) >= 2 &&
-          this.getCharactersCounter(this.formDescription) <= 200
-      )
+    /**
+     * возвращает правильность введенной в поле названия строки
+     * @returns {boolean}
+     */
+    correctTitle() {
+      return this.checkValue(this.formTitle, this.rules.title)
     },
+    /**
+     * возвращает правильность введенной в поле описания строки
+     * @returns {boolean}
+     */
+    correctDescription() {
+      return this.checkValue(this.formDescription, this.rules.description)
+    },
+    /**
+     * правило блокирования кнопки отправки формы
+     * @returns {boolean}
+     */
+    submitDisable() {
+      return !this.correctDescription || !this.correctTitle
+    },
+    /**
+     * возвращает и задает значение поля названия
+     */
     formTitle: {
       get() {
         return this.formData.title
@@ -67,6 +98,9 @@ export default {
         this.formData.title = e.trim()
       }
     },
+    /**
+     * возвращает и задает значение поля описания
+     */
     formDescription: {
       get() {
         return this.formData.description
@@ -77,9 +111,37 @@ export default {
     }
   },
   methods: {
-    getCharactersCounter(field) {
-      return field ? field.length : 0
+    /**
+     * возвращает истинность поля согласно правилам
+     * @param value - значение поля
+     * @param rules - правила
+     * @returns {boolean}
+     */
+    checkValue(value, rules) {
+      const length = this.getCharactersCounter(value)
+
+      return Object.keys(rules).map(key => {
+        switch (key) {
+          case 'minLength':
+            return length >= rules[key]
+          case 'maxLength':
+            return length <= rules[key]
+          default:
+            return false
+        }
+      }).every(item => item)
     },
+    /**
+     * возвращает число символов в строке без пробелов
+     * @param field - строка
+     * @returns {*|number}
+     */
+    getCharactersCounter(field) {
+      return field ? field.trim().length : 0
+    },
+    /**
+     * формирует объект с полями формы и вызывает событие создания элемента
+     */
     addTodoItem() {
       const data = []
       Object.keys(this.formData).forEach(key => {
@@ -88,6 +150,10 @@ export default {
       })
       this.$emit('createTodo', data)
     },
+    /**
+     * устанавливает поля для редактирования в поля формы
+     * @param e - объект для редактирования
+     */
     setEditFields(e) {
       Object.keys(e).forEach(key => {
         this.formData[key] = e[key]
@@ -95,6 +161,9 @@ export default {
     },
   },
   watch: {
+    /**
+     * следит за изменением объекта для редактирования
+     */
     formDataEdit: {
       handler(e) {
         this.setEditFields(e)
@@ -142,7 +211,14 @@ export default {
     }
   }
 }
-
+.todo-form__textarea {
+  transition: .2s ease;
+  overflow: auto;
+  height: 40px;
+  &:focus {
+    height: 80px;
+  }
+}
 .todo-form__button-wrapper {
   display: flex;
   justify-content: center;

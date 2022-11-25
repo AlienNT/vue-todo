@@ -86,6 +86,10 @@ export default {
     }
   },
   computed: {
+    /**
+     * возвращает настройки для кнопок взаимодействия с элеметнами списка
+     * @returns {[{disabled: boolean, type: string}]}
+     */
     buttons() {
       return [
         {
@@ -102,30 +106,69 @@ export default {
         }
       ]
     },
+    /**
+     * правило блокирования кнопки редактирования
+     * срабатывает когда выбрано 0 или более 1 элемента
+     * @returns {boolean}
+     */
     editBtnDisable() {
       return !this.selectedTodoAmount || (this.selectedTodoAmount > 1)
     },
+    /**
+     * правило блокирования кнопки удаления
+     * срабатывает когда нет выбранных элементов
+     * @returns {boolean}
+     */
     deleteBtnDisable() {
       return !this.selectedTodoAmount
     },
+    /**
+     * правило блокирования кпопки сортировки
+     * срабатывает при количестве элементов меньше 2
+     * @returns {boolean}
+     */
     sortBtnDisable() {
       return this.todoAmount <= 1
     },
+    /**
+     * правило блокирования кнопки выбора записей
+     * срабатывает при отсутствии записей
+     * @returns {boolean}
+     */
     selectAllBtnDisable() {
       return !this.todoAmount
     },
+    /**
+     * возвращает список выбранных элементов
+     * @returns {*[]}
+     */
     selectedTodos() {
       return this.todoList.filter(item => item.status)
     },
+    /**
+     * возвращает число элементов
+     * @returns {number|number}
+     */
     todoAmount() {
       return this.todoList.length || 0
     },
+    /**
+     * возвращает число выбранных элементов
+     * @returns {number|number}
+     */
     selectedTodoAmount() {
       return this.selectedTodos?.length || 0
     },
+    /**
+     * возвращает отсортированный список элементов по полю даты
+     * @returns {*}
+     */
     sortedTodoList() {
       return this.sortByField(this.todoList, 'date', this.isSort)
     },
+    /**
+     * получает и записывает данные о элементах в localStorage
+     */
     localStorage: {
       get() {
         const storage = localStorage.getItem('todoList')
@@ -140,17 +183,33 @@ export default {
     }
   },
   methods: {
+    /**
+     * возвращает сортированный массив объектов по заданным параметрам
+     * @param array - исходный массив
+     * @param fieldName - имя поля сортировки
+     * @param order - порядок сортировки (true - от старых к новым)
+     * @returns {*}
+     */
     sortByField(array, fieldName, order = true) {
       return array && fieldName &&
           array.sort((a, b) => order ?
               a[fieldName] - b[fieldName] :
               b[fieldName] - a[fieldName])
     },
+    /**
+     * обновляет элемент в массиве
+     * @param data - исходный массив
+     * @param index - индекс элемента в массиве
+     */
     updateTodoItem(data, index) {
       this.todoList[index] = {...data}
       this.todoList[index].status = false
       this.formData = {}
     },
+    /**
+     * добавляет новый элемент в массив
+     * @param data - новый элемент
+     */
     createTodoItem(data) {
       this.todoList.push({
         id: data?.id || Date.now(),
@@ -160,6 +219,10 @@ export default {
         date: Date.now(),
       })
     },
+    /**
+     * определяет и вызывает метод обновления или создания нового элемента
+     * @param data - элемент
+     */
     addTodoItem(data) {
       const index = this.todoList.findIndex(item => item.id === data?.id)
 
@@ -167,23 +230,43 @@ export default {
           this.updateTodoItem(data, index) :
           this.createTodoItem(data)
     },
+    /**
+     * устанавливает статус элемента
+     * @param e - переданный элемент
+     */
     setTodoStatus(e) {
       this.todoList.find(item => item.id === e.id).status = e.status
     },
+    /**
+     * меняет статус выделения всех элементов массива дел
+     */
     selectAction() {
       this.selectedTodoAmount === this.todoAmount ?
           this.todoList.forEach(item => item.status = false) :
           this.todoList.forEach(item => item.status = true)
     },
+    /**
+     * записывает выделенный элемент в объект редактирования
+     */
     editAction() {
       this.formData = this.todoList.find(item => item.status)
     },
+    /**
+     * удаляет выбранные элементы путем перезаписывания исходного массива оставшимися элементами
+     */
     deleteAction() {
       this.todoList = this.todoList.filter(todo => !todo.status)
     },
+    /**
+     * меняет направление сортировки массива
+     */
     sortAction() {
       this.isSort = !this.isSort
     },
+    /**
+     * записывает массив дел из localStorage, если таковой имеется
+     * @returns {{length}|*|undefined}
+     */
     setTodosInStorage() {
       return this.localStorage?.length ?
           this.todoList = this.localStorage :
@@ -191,6 +274,9 @@ export default {
     }
   },
   watch: {
+    /**
+     * следит за изменением массива дел и перезаписывает localStorage
+     */
     todoList: {
       handler(data) {
         this.localStorage = data
@@ -199,10 +285,8 @@ export default {
     }
   },
   created() {
-    if (this.localStorage?.length) {
-      this.setTodosInStorage()
-    }
-  },
+    this.setTodosInStorage()
+  }
 }
 </script>
 
