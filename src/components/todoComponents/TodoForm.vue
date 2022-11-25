@@ -10,6 +10,7 @@
           class="todo-form__input v-box-hover"
           name="title"
           placeholder="Title"
+          title="input title"
       >
     </label>
     <label class="todo-form__label">
@@ -17,10 +18,10 @@
           v-model="formDescription"
           class="todo-form__textarea v-box-hover"
           placeholder="Description"
+          title="input description"
       />
     </label>
     <div class="todo-form__button-wrapper">
-      <div class="todo-check-all"></div>
       <slot name="checkbox"/>
       <button
           class="todo-form__button v-box-hover"
@@ -53,7 +54,10 @@ export default {
   },
   computed: {
     submitDisable() {
-      return !(this.getCharactersCounter(this.formTitle) >= 2 && this.getCharactersCounter(this.formDescription) <= 200)
+      return !(
+          this.getCharactersCounter(this.formTitle) >= 2 &&
+          this.getCharactersCounter(this.formDescription) <= 200
+      )
     },
     formTitle: {
       get() {

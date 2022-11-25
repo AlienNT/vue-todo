@@ -8,7 +8,6 @@
           class="todo-list__item"
           v-for="(todoItem, key) in todoList"
           :key="todoItem.id || key"
-          ref="todo-item"
       >
 
         <TodoItem
@@ -28,12 +27,6 @@ export default {
   components: {
     TodoItem
   },
-  data() {
-    return {
-      showScroll: true,
-      counter: null
-    }
-  },
   props: {
     todoList: {
       type: Array,
@@ -45,17 +38,14 @@ export default {
 
 <style scoped lang="scss">
 .v-todo-list {
-  position: relative;
-  margin-left: -15px;
-  margin-right: -15px;
-  padding: 15px;
+  height: 100%;
 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  overflow: hidden auto;
-  max-height: 600px;
+  > * {
+    margin-bottom: 10px;
 
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
 }
 </style>

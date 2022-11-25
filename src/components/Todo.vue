@@ -11,52 +11,47 @@
               @createTodo="addTodoItem"
           >
             <template v-slot:checkbox>
-              <div class="todo__checkbox v-col">
-                <button
-                    v-if="todoAmount"
-                    class="todo-check-all v-box-hover"
-                    :class="{
-                      'all-check': todoAmount === selectedTodoAmount,
-                      'any-check': selectedTodoAmount && todoAmount >= selectedTodoAmount
-                    }"
-                    type="button"
-                    :disabled="selectAllBtnDisable"
-                    @click.prevent.stop="selectAction"
-                />
-              </div>
+              <TodoCheckbox
+                  v-if="todoAmount"
+                  class="v-col"
+                  :amount="todoAmount"
+                  :selected-amount="selectedTodoAmount"
+                  :disabled="selectAllBtnDisable"
+                  @selectedEvent="selectAction"
+              />
             </template>
             <template v-slot:actions>
-              <div class="todo__action-buttons v-col">
-                <button
-                    v-if="todoAmount"
-                    class="todo__action-button todo-button_edit v-box-hover"
-                    type="button"
-                    :disabled="editBtnDisable"
-                    @click.prevent.stop="editAction"
-                />
-                <button
-                    v-if="todoAmount"
-                    class="todo__action-button todo-button_delete v-box-hover"
-                    type="button"
-                    :disabled="deleteBtnDisable"
-                    @click.prevent.stop="deleteAction"
-                />
-              </div>
+              <TodoActionsButtons
+                  v-if="todoAmount"
+                  class="v-col"
+                  :buttons="buttons"
+                  @sortEvent="sortAction"
+                  @editEvent="editAction"
+                  @deleteEvent="deleteAction"
+              />
             </template>
           </TodoForm>
         </div>
-        <div class="todo__list">
-          <div class="title todo-amount" v-if="todoAmount">Amount: {{ todoAmount }}</div>
+        <div
+            v-if="todoAmount"
+            class="title todo__amount"
+        >
+          Amount: {{ todoAmount }}
+        </div>
+        <div class="todo__list v-scroll-hidden">
           <transition name="todo-list">
             <TodoList
                 v-if="todoAmount"
-                :todo-list="todoList"
+                :todo-list="sortedTodoList"
                 @setStatus="setTodoStatus"
             />
           </transition>
         </div>
         <div class="todo__author">
-          created by <a href="https://github.com/AlienNT/">AlienNT</a>
+          <AuthorLink
+              title="AlienNT"
+              link="https://github.com/AlienNT/"
+          />
         </div>
       </div>
     </div>
@@ -66,13 +61,19 @@
 <script>
 import TodoForm from "@/components/todoComponents/TodoForm";
 import TodoList from "@/components/todoComponents/TodoList";
+import AuthorLink from "@/components/AuthorLink";
+import TodoCheckbox from "@/components/todoComponents/TodoCheckbox";
+import TodoActionsButtons from "@/components/todoComponents/TodoActionsButtons";
 
 
 export default {
   name: "MainComponent",
   components: {
     TodoForm,
-    TodoList
+    TodoList,
+    AuthorLink,
+    TodoCheckbox,
+    TodoActionsButtons
   },
   data() {
     return {
@@ -80,18 +81,38 @@ export default {
       formData: {
         title: null,
         description: null
-      }
+      },
+      isSort: true
     }
   },
   computed: {
+    buttons() {
+      return [
+        {
+          type: 'sort',
+          disabled: this.sortBtnDisable
+        },
+        {
+          type: 'edit',
+          disabled: this.editBtnDisable
+        },
+        {
+          type: 'delete',
+          disabled: this.deleteBtnDisable
+        }
+      ]
+    },
     editBtnDisable() {
       return !this.selectedTodoAmount || (this.selectedTodoAmount > 1)
     },
     deleteBtnDisable() {
       return !this.selectedTodoAmount
     },
+    sortBtnDisable() {
+      return this.todoAmount <= 1
+    },
     selectAllBtnDisable() {
-      return false
+      return !this.todoAmount
     },
     selectedTodos() {
       return this.todoList.filter(item => item.status)
@@ -101,6 +122,9 @@ export default {
     },
     selectedTodoAmount() {
       return this.selectedTodos?.length || 0
+    },
+    sortedTodoList() {
+      return this.sortByField(this.todoList, 'date', this.isSort)
     },
     localStorage: {
       get() {
@@ -116,6 +140,12 @@ export default {
     }
   },
   methods: {
+    sortByField(array, fieldName, order = true) {
+      return array && fieldName &&
+          array.sort((a, b) => order ?
+              a[fieldName] - b[fieldName] :
+              b[fieldName] - a[fieldName])
+    },
     updateTodoItem(data, index) {
       this.todoList[index] = {...data}
       this.todoList[index].status = false
@@ -151,6 +181,9 @@ export default {
     deleteAction() {
       this.todoList = this.todoList.filter(todo => !todo.status)
     },
+    sortAction() {
+      this.isSort = !this.isSort
+    },
     setTodosInStorage() {
       return this.localStorage?.length ?
           this.todoList = this.localStorage :
@@ -179,29 +212,30 @@ export default {
 .v-main-component {
   margin: auto;
   display: flex;
-  align-items: center;
-  justify-content: center;
   padding-top: 30px;
   padding-bottom: 30px;
   width: 100%;
   min-width: 240px;
-  max-height: 100vh;
   height: -webkit-fill-available;
-  overflow-y: hidden;
+
+  .v-container {
+    height: 100%;
+    display: flex;
+  }
 }
 
 .v-todo {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-width: 800px;
-  overflow-y: auto;
   width: 100%;
   margin: auto;
+  max-width: 600px;
   background: $primaryColor;
   padding: 15px;
   border-radius: 8px;
   box-shadow: $boxShadow;
+  max-height: 100%;
 
 }
 
@@ -210,97 +244,15 @@ export default {
   color: darken($primaryColor, 15%);
 }
 
-.todo-check-all {
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
-  border: 2px solid $secondaryColor;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:after {
-    transition: .2s ease;
-    content: '';
-    background-color: $secondaryColor;
-    opacity: 0;
-  }
-
-  &.any-check {
-    &:after {
-      opacity: 1;
-      width: 10px;
-      height: 10px;
-      border-radius: 2px;
-    }
-  }
-
-  &.all-check {
-    background-color: $secondaryColor;
-
-    &:after {
-      opacity: 1;
-      mask: url("../assets/images/icons/check-mark-2).svg") no-repeat center / 80%;
-      background-color: #fff;
-      width: 102%;
-      height: 102%;
-      border-radius: 0;
-    }
-  }
-}
-
-.todo__checkbox {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.todo__action-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.todo__action-button {
-  width: 20px;
-  height: 20px;
-  background-color: $secondaryColor;
-  background-size: contain;
-  mask-size: contain;
-  mask-repeat: no-repeat;
-  mask-position: center;
-
-}
-
-.todo-button_delete {
-  -webkit-mask-image: url("../assets/images/icons/delete-icon.svg");
-  mask-image: url("../assets/images/icons/delete-icon.svg");
-}
-
-.todo-button_edit {
-  -webkit-mask-image: url("../assets/images/icons/edit.svg");
-  mask-image: url("../assets/images/icons/edit.svg");
+.todo__amount {
+  color: darken($primaryColor, 15%);
+  font-size: 14px;
+  font-weight: bold;
 }
 
 .todo__list {
-  .todo-amount {
-    //color: darken($secondaryColor, 10%);
-    color: darken($primaryColor, 15%);
-    font-size: 14px;
-    font-weight: bold;
-  }
-}
-
-.todo__author {
-  width: 100%;
-  color: darken($primaryColor, 15%);
-  font-weight: bold;
-  text-align: center;
-  font-size: 12px;
-
-  > * {
-    color: $secondaryColor;
-  }
+  position: relative;
+  overflow: auto;
+  height: 100%;
 }
 </style>

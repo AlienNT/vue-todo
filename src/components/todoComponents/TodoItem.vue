@@ -1,6 +1,7 @@
 <template>
   <div
       class="v-todo-item v-box-hover"
+      ref="todo-item"
       :class="{
         'todo-active': data.status
       }"
@@ -31,7 +32,7 @@ export default {
     data: {
       type: Object,
       default: null,
-    }
+    },
   },
   data() {
     return {
@@ -41,7 +42,7 @@ export default {
   computed: {
     date() {
       return this.getDateFormat(this.data?.date)
-    }
+    },
   },
   methods: {
     setStatus() {
@@ -53,6 +54,9 @@ export default {
     getDateFormat(date) {
       return date ? new Date(date).toLocaleDateString() : null
     },
+  },
+  mounted() {
+    this.$refs["todo-item"].scrollIntoView()
   }
 }
 </script>
