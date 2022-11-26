@@ -40,7 +40,7 @@ export default {
 
 .todo-button_sort {
   -webkit-mask-image: url("../../assets/images/icons/expand.svg");
-  mask-image: url("../../assets/images/icons/edit.svg");
+  mask-image: url("../../assets/images/icons/expand.svg");
 }
 
 .todo-button_edit {
