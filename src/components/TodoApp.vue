@@ -313,7 +313,7 @@ export default {
   flex-direction: column;
   gap: 10px;
   width: 100%;
-  margin: 0 0 auto 0;
+  margin: 0 auto auto;
   max-width: 600px;
   background: $primaryColor;
   padding: 15px;
