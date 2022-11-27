@@ -214,10 +214,7 @@ export default {
 .todo-form__textarea {
   transition: .2s ease;
   overflow: auto;
-  height: 40px;
-  &:focus {
-    height: 80px;
-  }
+  height: 60px;
 }
 .todo-form__button-wrapper {
   display: flex;
